@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0c1410">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Noites">
 <meta name="description" content="Jogo de sobrevivência na floresta para jogar sozinho ou com até 4 amigos, no celular ou no computador.">
 <title>Noites na Floresta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,7 +38,6 @@ h1{font-family:var(--display);font-size:clamp(20px,4vw,32px);margin:0;color:var(
 button.chip{cursor:pointer;font-family:var(--body)}
 .stage{position:relative;width:100%;max-width:800px}
 canvas#c{display:block;width:100%;height:auto;border-radius:10px;border:2px solid var(--line);background:#1d3a24;touch-action:none}
-.netbadge{position:absolute;left:50%;top:8px;transform:translateX(-50%);background:rgba(5,10,8,.75);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800;color:var(--sky);pointer-events:none}
 
 /* telas */
 .overlay{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(6,10,8,.94);overflow:auto;
@@ -107,39 +110,57 @@ kbd{font-family:var(--display);background:var(--bg);border:1px solid var(--line)
   .chip{font-size:12px;padding:2px 8px}.bar{width:40px}
   .joy{width:120px;height:120px}.act{width:100px;height:100px;font-size:16px}.itm button{min-width:82px;font-size:13px}.right-ctl{gap:8px}
 }
-/* celular deitado: controles por cima do jogo */
-@media (pointer:coarse) and (orientation:landscape) and (max-height:560px){
-  body{padding-top:calc(4px + env(safe-area-inset-top,0px));gap:4px}
-  h1,.help{display:none}
-  .stage{max-width:calc((100svh - 46px) * 800 / 560)}
-  .controls{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));max-width:none;pointer-events:none;
-    padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));z-index:5}
-  .controls>*{pointer-events:auto}
-  .joy{opacity:.8}.itm button,.act{opacity:.92}
-}
+.chip .ic{display:none}.chip .ic.food{color:var(--leaf)}.chip .ic.wood{color:#c79a63}.chip .mb{display:none}
+.chip.menu kbd{font-size:11px}
+.howto{color:var(--muted)!important;font-size:14px!important;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.howto kbd{font-size:12px}
+
+/* ===== computador: só teclado, jogo grande ===== */
+body.desktop .controls{display:none}
+body.desktop .stage{width:auto}
+body.desktop canvas#c{width:100%;height:auto}
+
+/* ===== celular: jogo em tela cheia, controles por cima ===== */
+body.mobile{position:fixed;inset:0;overflow:hidden;padding:0;overscroll-behavior:none;touch-action:none}
+body.mobile h1,body.mobile .help,body.mobile .dt{display:none!important}
+body.mobile .stage{position:fixed;inset:0;max-width:none;width:100%;height:100%}
+body.mobile canvas#c{width:100%!important;height:100%!important;border:0;border-radius:0}
+body.mobile .hud{position:fixed;top:0;left:0;right:0;z-index:6;max-width:none;justify-content:flex-start;flex-wrap:nowrap;gap:4px;pointer-events:none;
+  padding:calc(6px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 0 max(8px,env(safe-area-inset-left,0px))}
+body.mobile .hud .chip{background:rgba(12,20,16,.78);pointer-events:auto;font-size:13px;padding:4px 9px}
+body.mobile .chip .lb{display:none}body.mobile .chip .ic{display:inline;color:var(--danger)}body.mobile .chip .ic.food{color:var(--leaf)}body.mobile .chip .ic.wood{color:#c79a63}
+body.mobile .bar{width:44px}
+body.mobile .chip.menu{margin-left:auto;font-size:18px;padding:2px 12px}body.mobile .chip .mb{display:inline}
+body.mobile .controls{position:fixed;left:0;right:0;bottom:0;z-index:6;max-width:none;align-items:flex-end;pointer-events:none;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+body.mobile .controls>*{pointer-events:auto}
+body.mobile .joy{width:140px;height:140px;background:radial-gradient(circle,rgba(29,47,36,.55) 0 55%,rgba(22,36,28,.6) 56%);border-color:rgba(159,179,163,.35)}
+body.mobile .knob{background:rgba(232,240,230,.75)}
+body.mobile .right-ctl{align-items:flex-end}
+body.mobile .itm button{background:rgba(22,36,28,.8)}
+body.mobile .act{width:112px;height:112px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+@media (orientation:landscape){body.mobile .joy{width:128px;height:128px}body.mobile .act{width:100px;height:100px}}
 </style>
 </head>
 <body>
 <h1>Noites na Floresta</h1>
-<div class="hud" aria-live="off">
+<div class="hud" id="hud" aria-live="off">
   <span class="chip"><b>Noite</b><span id="hNight">1/10</span></span>
-  <span class="chip" id="hClock">Escurece em 26s</span>
-  <span class="chip"><b>Vida</b><span class="bar"><i id="hpBar"></i></span></span>
-  <span class="chip"><b>Comida</b><span class="bar"><i id="foodBar"></i></span></span>
-  <span class="chip"><b>Mochila</b><span id="hWood">0/6</span></span>
-  <span class="chip"><b>Depósito</b><span id="hDepot">0</span></span>
-  <span class="chip"><b>Fogo</b><span id="hFire">70%</span></span>
-  <span class="chip"><b>Amigos</b><span id="hFriends">0/4</span></span>
-  <button class="chip" id="soundBtn" type="button">Som: ligado</button>
-  <button class="chip" id="exitBtn" type="button" hidden>Sair</button>
+  <span class="chip dt" id="hClock">Escurece em 26s</span>
+  <span class="chip"><b class="lb">Vida</b><b class="ic" aria-hidden="true">&#9829;&#xFE0E;</b><span class="bar"><i id="hpBar"></i></span></span>
+  <span class="chip"><b class="lb">Comida</b><b class="ic food" aria-hidden="true">&#9679;&#xFE0E;</b><span class="bar"><i id="foodBar"></i></span></span>
+  <span class="chip"><b class="lb">Mochila</b><b class="ic wood" aria-hidden="true">&#9646;&#xFE0E;</b><span id="hWood">0/6</span></span>
+  <span class="chip dt"><b>Depósito</b><span id="hDepot">0</span></span>
+  <span class="chip dt"><b>Fogo</b><span id="hFire">70%</span></span>
+  <span class="chip dt"><b>Amigos</b><span id="hFriends">0/4</span></span>
+  <button class="chip menu" id="menuBtn" type="button" aria-label="Abrir menu"><span class="dt">Menu <kbd>Esc</kbd></span><span class="mb" aria-hidden="true">&#9776;&#xFE0E;</span></button>
 </div>
 
 <div class="stage" id="stage">
   <canvas id="c" width="800" height="560" aria-label="Floresta do jogo"></canvas>
-  <div class="netbadge" id="netBadge" hidden></div>
 </div>
 
-<div class="controls">
+<div class="controls" id="controls">
   <div class="joy" id="joy" aria-label="Controle de movimento"><div class="knob" id="knob"></div></div>
   <div class="right-ctl">
     <div class="itm">
@@ -150,10 +171,10 @@ kbd{font-family:var(--display);background:var(--bg);border:1px solid var(--line)
   </div>
 </div>
 
-<div class="help">
-  <div><strong>Como jogar</strong>No celular, arraste a bolinha para andar e toque no botão laranja. No computador, use as <kbd>setas</kbd> ou <kbd>W A S D</kbd> e a <kbd>espaço</kbd>. <kbd>Q</kbd> coloca o item, <kbd>X</kbd> troca.</div>
-  <div><strong>Jogar com amigos</strong>Uma pessoa toca em "Criar partida online" e mostra o código. As outras, até 4 no total, tocam em "Entrar com código" no próprio celular.</div>
-  <div><strong>Juntos na floresta</strong>A fogueira, o depósito e a bancada são do grupo. Se alguém cair, outro jogador chega perto e toca em "Ajudar" para levantar. Todo mundo levanta ao amanhecer.</div>
+<div class="help" id="help">
+  <div><strong>Teclado</strong><kbd>setas</kbd> ou <kbd>W A S D</kbd> andam. <kbd>Espaço</kbd> faz a ação. <kbd>Q</kbd> coloca a tocha ou armadilha, <kbd>X</kbd> troca o item e <kbd>Esc</kbd> abre o menu.</div>
+  <div><strong>Jogar com amigos</strong>Uma pessoa clica em "Criar partida online" e passa o código. As outras, até 4 no total, entram com o código no computador ou no celular.</div>
+  <div><strong>Juntos na floresta</strong>A fogueira, o depósito e a bancada são do grupo. Se alguém cair, outro jogador chega perto e aperta <kbd>Espaço</kbd> para ajudar. Todo mundo levanta ao amanhecer.</div>
   <div><strong>Amigos perdidos</strong>Siga os caminhos de terra até os pontos amarelos do mapinha. Depois de salvos, eles cortam árvores de dia e alimentam o fogo de noite.</div>
 </div>
 
@@ -161,6 +182,7 @@ kbd{font-family:var(--display);background:var(--bg);border:1px solid var(--line)
   <section class="scr" id="scrMenu">
     <h2>Noites na Floresta</h2>
     <p>Corte árvores, mantenha a fogueira acesa e salve os 4 amigos perdidos. De noite, a Sombra e os lobos saem para caçar, mas têm medo da luz.</p>
+    <p class="howto" id="howTo"></p>
     <label class="field"><span>Seu nome</span><input class="txt" id="nameIn" maxlength="12" autocomplete="off" placeholder="Ex.: Alice"></label>
     <div class="opt"><span class="lbl">Noites</span>
       <div class="seg" id="goalSeg"><button type="button" data-v="10" aria-pressed="true">10</button><button type="button" data-v="30" aria-pressed="false">30</button><button type="button" data-v="99" aria-pressed="false">99</button></div>
@@ -197,6 +219,17 @@ kbd{font-family:var(--display);background:var(--bg);border:1px solid var(--line)
     <button class="btn" id="startBtn" type="button" hidden>Começar</button>
     <p class="status" id="lobbyStatus" role="status"></p>
     <button class="btn ghost" id="lobbyBack" type="button">Sair</button>
+  </section>
+
+  <section class="scr" id="scrPause" hidden>
+    <h2 id="pauseTitle">Pausa</h2>
+    <p class="muted" id="pauseInfo"></p>
+    <div class="menu-btns">
+      <button class="btn" id="resumeBtn" type="button">Continuar</button>
+      <button class="btn ghost" id="soundBtn" type="button">Som: ligado</button>
+      <button class="btn ghost" id="ctrlBtn" type="button">Controles: teclado</button>
+      <button class="btn ghost" id="quitBtn" type="button">Sair da partida</button>
+    </div>
   </section>
 
   <section class="scr" id="scrEnd" hidden>
@@ -759,7 +792,7 @@ function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i
 function myName(){const v=((!$('scrJoin').hidden?$('nameIn2').value:$('nameIn').value)||$('nameIn').value||$('nameIn2').value||'').trim();return (v||'Jogador').slice(0,12)}
 function netOk(){if(window.Peer)return true;return false}
 function createGame(){
-  initAudio();saveName();
+  initAudio();saveName();goFull();
   if(!netOk()){alert('Não foi possível carregar o modo online. Verifique a internet e recarregue a página.');return}
   cleanupNet();mode='host';myId='p0';code=genCode();nextId=1;
   show('scrLobby');$('codeBox').textContent='····';$('lobbyStatus').textContent='Criando partida...';$('startBtn').hidden=true;$('shareBtn').hidden=true;renderLobby();
@@ -815,7 +848,7 @@ function hostStart(){
 /* ---------- rede: convidado ---------- */
 let joinTimer=null;
 function joinGame(){
-  initAudio();saveName();
+  initAudio();saveName();goFull();
   const cd=$('codeIn').value.trim().toUpperCase().replace(/[^A-Z]/g,'');
   if(cd.length!==4){$('joinStatus').textContent='O código tem 4 letras.';return}
   if(!netOk()){$('joinStatus').textContent='Não foi possível carregar o modo online. Verifique a internet.';return}
@@ -951,9 +984,19 @@ function openCraft(){
 function closeCraft(){paused=false;$('craft').hidden=true;hud()}
 
 /* ---------- telas ---------- */
-const SCREENS=['scrMenu','scrJoin','scrLobby','scrEnd'];
-function show(id){$('ov').hidden=false;SCREENS.forEach(s=>$(s).hidden=s!==id);$('exitBtn').hidden=true}
-function hideOv(){$('ov').hidden=true;$('exitBtn').hidden=false;$('craft').hidden=true;paused=false}
+const SCREENS=['scrMenu','scrJoin','scrLobby','scrPause','scrEnd'];
+function show(id){$('ov').hidden=false;SCREENS.forEach(s=>$(s).hidden=s!==id);for(const k in keys)keys[k]=0;resetJoy()}
+function hideOv(){$('ov').hidden=true;$('craft').hidden=true;paused=false;setTimeout(fit,30)}
+function openPause(){
+  if(!running||over)return;
+  $('craft').hidden=true;
+  if(mode==='solo')paused=true;
+  $('pauseTitle').textContent=mode==='solo'?'Pausa':'Menu';
+  $('pauseInfo').textContent=mode==='solo'?'O jogo está pausado.':(mode==='host'?'Código da partida: '+code+' · ':'')+players.length+(players.length===1?' jogador':' jogadores')+'. No jogo online a floresta continua andando.';
+  $('quitBtn').textContent=mode==='host'?'Encerrar a partida':'Sair da partida';
+  show('scrPause');
+}
+function resumeGame(){if(!$('scrPause').hidden)hideOv()}
 function renderLobby(){
   const list=mode==='host'?lobbyList():lobbyNames;const ul=$('plist');ul.innerHTML='';
   for(let i=0;i<MAXP;i++){const li=document.createElement('li');const it=list[i];
@@ -984,17 +1027,29 @@ function hud(){
   const me=getMe()||{hp:100,food:100,wood:0};
   const cyc=time%CYCLE,left=Math.ceil(dark?CYCLE-cyc:DAY-cyc);
   $('hNight').textContent=Math.min(night,goal)+'/'+goal;
-  const ck=$('hClock');ck.textContent=(dark?'Noite · amanhece em ':'Dia · escurece em ')+left+'s';ck.className='chip '+(dark?'night':'day');
+  const ck=$('hClock');ck.textContent=(dark?'Noite · amanhece em ':'Dia · escurece em ')+left+'s';ck.className='chip dt '+(dark?'night':'day');
   $('hpBar').style.width=clamp(me.hp,0,100)+'%';$('foodBar').style.width=clamp(me.food,0,100)+'%';
   $('hWood').textContent=me.wood+'/'+cap();$('hDepot').textContent=depot.wood;$('hFire').textContent=Math.round(fire.fuel)+'%';
   $('hFriends').textContent=friends.filter(f=>f.st==='saved').length+'/4';
   const t=running&&!over&&!me.down?target(getMe()):null;$('actBtn').textContent=me.down?'Caído…':t?LABEL[t.k]:'Ação';
   const ub=$('useBtn');ub.innerHTML='Colocar<br>'+INAME[sel]+' '+(inv[sel]|0);ub.classList.toggle('empty',(inv[sel]|0)<=0);
-  const nb=$('netBadge');
-  if(mode!=='solo'&&running){nb.hidden=false;nb.textContent=(mode==='host'?'Código '+code+' · ':'')+players.length+' jogando'}else nb.hidden=true;
 }
 
 /* ---------- desenho ---------- */
+function keyCap(px,py,key,txt){
+  x.font='bold 13px "Nunito", system-ui, sans-serif';const kw=x.measureText(key).width+10;x.font='bold 13px "Nunito", system-ui, sans-serif';const tw=x.measureText(txt).width;
+  const w=kw+tw+16,h=22,l=px-w/2;
+  x.fillStyle='rgba(5,10,8,.8)';x.beginPath();x.roundRect(l,py-h/2,w,h,7);x.fill();
+  x.fillStyle='#e8f0e6';x.beginPath();x.roundRect(l+4,py-h/2+3,kw,h-6,4);x.fill();
+  x.fillStyle='#16241c';x.textAlign='center';x.fillText(key,l+4+kw/2,py+4.5);
+  x.fillStyle='#ffcf5a';x.textAlign='left';x.fillText(txt,l+kw+10,py+4.5);
+}
+function drawKeyHints(me,tg){
+  if(tg){const o=tg.k==='bench'?bench:tg.k==='depot'?depot:tg.k==='fire'?fire:tg.o;const sy=o.y-cam.y-(tg.k==='tree'?78:tg.k==='fire'?60:44);keyCap(o.x-cam.x,sy,'Espaço',LABEL[tg.k])}
+  const n=inv[sel]|0,t='Q colocar '+INAME[sel].toLowerCase()+' ('+n+')   X trocar   Esc menu';
+  x.font='bold 12px "Nunito", system-ui, sans-serif';x.textAlign='left';const w=x.measureText(t).width+16;
+  x.fillStyle='rgba(5,10,8,.65)';x.beginPath();x.roundRect(10,VH-30,w,22,7);x.fill();x.fillStyle='#c9d6cc';x.fillText(t,18,VH-15);
+}
 function drawFriend(f){
   drawPerson({px:f.x,py:f.y,shirt:f.shirt,hair:f.hair,face:f.face,walk:f.mv?f.step:0,carry:f.carry*3,axe:f.st==='saved'&&!dark,swing:f.swing,lost:f.st==='lost'});
   if(f.st==='lost'){const yb=Math.sin(frame*.08)*3;
@@ -1033,6 +1088,7 @@ function updateFx(dt){
   if(msgT>0)msgT-=k;
 }
 function draw(){
+  x.setTransform(c.width/VW,0,0,c.height/VH,0,0);
   const me=getMe();const ctr=me||fire;
   cam.x=clamp(ctr.x-VW/2,0,WW-VW);cam.y=clamp(ctr.y-VH/2,0,WH-VH);
   let sx=0,sy=0;if(shake>0){sx=(Math.random()-.5)*shake;sy=(Math.random()-.5)*shake;shake*=.85;if(shake<.5)shake=0}
@@ -1060,16 +1116,16 @@ function draw(){
     d2.globalCompositeOperation='destination-out';
     const Ls=lights();for(const l of Ls)hole(l.x-cam.x,l.y-cam.y,l.r);
     for(const p of players)hole(p.x-cam.x,p.y-cam.y,p.down?40:lantern()?140:62);
-    d2.globalCompositeOperation='source-over';x.drawImage(dc,0,0);
+    d2.globalCompositeOperation='source-over';x.drawImage(dc,0,0,VW,VH);
     for(const l of Ls){const g=x.createRadialGradient(l.x-cam.x,l.y-cam.y,0,l.x-cam.x,l.y-cam.y,l.r);g.addColorStop(0,'rgba(255,140,40,'+(.2*a)+')');g.addColorStop(1,'rgba(255,140,40,0)');x.fillStyle=g;x.fillRect(0,0,VW,VH)}
     for(const m of mons)if(inView(m,20))drawEyes(m);
     for(let i=0;i<34;i++){const tw=(Math.sin(frame*.05+i)+1)/2;x.globalAlpha=a*(.4+tw*.6);x.fillStyle='#fff';x.fillRect((i*197+cam.x*.05)%VW,(i*89)%80+4,2,2)}x.globalAlpha=1;
   }
   if(running&&me&&!me.down&&me.hp<30){const g=x.createRadialGradient(VW/2,VH/2,VH*.35,VW/2,VH/2,VH*.75);g.addColorStop(0,'rgba(229,72,77,0)');g.addColorStop(1,'rgba(229,72,77,'+(.25+Math.sin(frame*.15)*.1)+')');x.fillStyle=g;x.fillRect(0,0,VW,VH)}
   if(running&&me&&me.down){x.fillStyle='rgba(20,0,0,.35)';x.fillRect(0,0,VW,VH);x.textAlign='center';x.fillStyle='#fff';x.font='bold 26px "Pixelify Sans", monospace';x.fillText('Você caiu!',VW/2,VH/2-86);x.font='bold 16px "Pixelify Sans", monospace';x.fillText('Peça ajuda ou espere amanhecer.',VW/2,VH/2-62)}
-  if(running)drawClock();
+  if(running){x.save();x.translate(0,uiTop);drawClock();x.restore()}
   /* mapinha */
-  const mw=VW<600?110:150,mh=mw*WH/WW,m0x=VW-mw-10,m0y=10,s=mw/WW;
+  const mw=Math.min(VW,VH)<600?110:150,mh=mw*WH/WW,m0x=VW-mw-10,m0y=10+uiTop,s=mw/WW;
   x.fillStyle='rgba(5,10,8,.7)';x.fillRect(m0x,m0y,mw,mh);x.strokeStyle='rgba(232,240,230,.35)';x.lineWidth=1;x.strokeRect(m0x+.5,m0y+.5,mw,mh);
   x.strokeStyle='rgba(232,240,230,.25)';x.strokeRect(m0x+cam.x*s,m0y+cam.y*s,VW*s,VH*s);
   x.fillStyle='#ff9a2e';x.beginPath();x.arc(m0x+fire.x*s,m0y+fire.y*s,4,0,7);x.fill();
@@ -1078,20 +1134,69 @@ function draw(){
     else if(f.st==='follow'||frame%40<28){x.fillStyle='#ffd166';x.fillRect(m0x+f.x*s-2.5,m0y+f.y*s-2.5,5,5)}}
   if(dark)for(const m of mons){x.fillStyle=m.t==='w'?'#adb5bd':'#c77dff';x.fillRect(m0x+m.x*s-2,m0y+m.y*s-2,4,4)}
   for(const p of players){x.fillStyle=LOOKS[p.slot%4].shirt;x.beginPath();x.arc(m0x+p.x*s,m0y+p.y*s,p.id===myId?4:3,0,7);x.fill();if(p.id===myId){x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke()}}
+  if(mode!=='solo'&&running){x.font='bold 12px "Nunito", system-ui, sans-serif';x.textAlign='right';const t=(mode==='host'?'Código '+code+' · ':'')+players.length+' jogando';
+    const tw=x.measureText(t).width+12;x.fillStyle='rgba(5,10,8,.7)';x.beginPath();x.roundRect(m0x+mw-tw,m0y+mh+6,tw,18,6);x.fill();x.fillStyle='#6cc4ff';x.fillText(t,m0x+mw-6,m0y+mh+19)}
+  if(device==='desktop'&&running&&!over&&me&&!me.down)drawKeyHints(me,tg);
   if(msgT>0&&msg){const fs=VW<600?17:22;x.font='bold '+fs+'px "Pixelify Sans", monospace';x.textAlign='center';
     let w=x.measureText(msg).width+28;if(w>VW-16){x.font='bold '+Math.floor(fs*.8)+'px "Pixelify Sans", monospace';w=x.measureText(msg).width+20}
-    x.globalAlpha=clamp(msgT/20,0,1);x.fillStyle='rgba(0,0,0,.72)';x.beginPath();x.roundRect(VW/2-w/2,VH-56,w,38,8);x.fill();
-    x.fillStyle='#ffcf5a';x.fillText(msg,VW/2,VH-30);x.globalAlpha=1}
+    x.globalAlpha=clamp(msgT/20,0,1);x.fillStyle='rgba(0,0,0,.72)';x.beginPath();const my=msgTop?uiTop+6:VH-56-uiBottom;x.roundRect(VW/2-w/2,my,w,38,8);x.fill();
+    x.fillStyle='#ffcf5a';x.fillText(msg,VW/2,my+26);x.globalAlpha=1}
   if(paused&&running){x.fillStyle='rgba(0,0,0,.25)';x.fillRect(0,0,VW,VH)}
 }
 
-/* ---------- tela responsiva ---------- */
-function fit(){
-  const w=$('stage').clientWidth||800;
-  const nw=w<620?440:800,nh=w<620?528:560;
-  if(nw!==VW||nh!==VH){VW=nw;VH=nh;c.width=VW;c.height=VH;dc.width=VW;dc.height=VH}
+/* ---------- tela responsiva e tipo de aparelho ---------- */
+let device='desktop',uiTop=0,uiBottom=0,msgTop=false;
+function detectDevice(){
+  const coarse=matchMedia('(pointer:coarse)').matches,noHover=matchMedia('(hover:none)').matches;
+  const touch=(navigator.maxTouchPoints||0)>0;
+  const ua=/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&touch);
+  return (coarse&&(noHover||ua))||(ua&&touch)?'mobile':'desktop';
 }
-addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
+function setDevice(d){
+  if(d===device&&document.body.classList.contains(d))return;
+  device=d;document.body.classList.toggle('mobile',d==='mobile');document.body.classList.toggle('desktop',d==='desktop');
+  for(const k in keys)keys[k]=0;resetJoy();
+  $('ctrlBtn').textContent='Controles: '+(d==='mobile'?'toque na tela':'teclado');
+  $('howTo').innerHTML=d==='mobile'
+    ?'Arraste a bolinha da esquerda para andar e toque no botão laranja para agir. O botão &#9776;&#xFE0E; abre o menu.'
+    :'Ande com <kbd>setas</kbd> ou <kbd>W A S D</kbd>. <kbd>Espaço</kbd> faz a ação, <kbd>Q</kbd> coloca item, <kbd>X</kbd> troca e <kbd>Esc</kbd> abre o menu.';
+  fit();
+}
+function fit(){
+  const dpr=Math.min(2,window.devicePixelRatio||1);let W,H;
+  if(device==='mobile'){
+    W=window.innerWidth;H=window.innerHeight;const k=430/Math.min(W,H);VW=Math.round(W*k);VH=Math.round(H*k);
+    c.style.width='';c.style.height='';$('stage').style.width='';
+  }else{
+    const stage=$('stage'),top=stage.getBoundingClientRect().top+window.scrollY;
+    const availW=Math.min(document.documentElement.clientWidth-24,1280);
+    const availH=Math.max(300,window.innerHeight-top-16);
+    const narrow=availW<620;VW=narrow?440:800;VH=narrow?528:560;
+    W=Math.max(300,Math.min(availW,availH*VW/VH));H=W*VH/VW;
+    stage.style.maxWidth='none';stage.style.width=W+'px';c.style.width=W+'px';c.style.height=H+'px';
+    $('hud').style.maxWidth=Math.max(W,320)+'px';$('help').style.maxWidth=Math.max(W,320)+'px';
+  }
+  const cw=Math.round(W*dpr),ch=Math.round(H*dpr);
+  if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch}
+  if(dc.width!==VW||dc.height!==VH){dc.width=VW;dc.height=VH}
+  if(device==='mobile'){
+    const k=VW/W;uiTop=($('hud').getBoundingClientRect().bottom+4)*k;
+    const cr=$('controls').getBoundingClientRect();uiBottom=Math.max(0,(H-cr.top))*k;msgTop=W>H;
+  }else{uiTop=0;uiBottom=0;msgTop=false}
+}
+addEventListener('resize',()=>fit());addEventListener('orientationchange',()=>setTimeout(fit,250));
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,100));
+/* troca automática: tocou na tela = celular; usou o teclado do jogo = computador */
+addEventListener('touchstart',()=>{if(device!=='mobile')setDevice('mobile')},{passive:true,capture:true});
+addEventListener('keydown',e=>{
+  if(device!=='mobile'||e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))setDevice('desktop');
+},true);
+function goFull(){
+  if(device!=='mobile')return;
+  const el=document.documentElement,rf=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(rf&&!document.fullscreenElement){try{const p=rf.call(el,{navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+}
 
 /* ---------- controles ---------- */
 const kmap={arrowup:'up',w:'up',arrowdown:'down',s:'down',arrowleft:'left',a:'left',arrowright:'right',d:'right'};
@@ -1104,6 +1209,7 @@ function craftKeys(e){
 }
 addEventListener('keydown',e=>{
   if(!$('craft').hidden){craftKeys(e);return}
+  if(e.key==='Escape'){if(!$('ov').hidden){if(!$('scrPause').hidden){e.preventDefault();resumeGame()}return}if(running&&!over){e.preventDefault();openPause()}return}
   if(!$('ov').hidden)return;
   const k=e.key.toLowerCase();
   if(kmap[k]){keys[kmap[k]]=1;e.preventDefault()}
@@ -1132,8 +1238,12 @@ for(const id of ['actBtn','useBtn','swapBtn'])$(id).addEventListener('contextmen
 $('cClose').addEventListener('click',closeCraft);
 $('craft').addEventListener('click',e=>{if(e.target===$('craft'))closeCraft()});
 $('soundBtn').addEventListener('click',()=>setSound(!soundOn));
-$('exitBtn').addEventListener('click',()=>{if(confirm(mode==='host'?'Sair? A partida vai acabar para todos.':'Sair da partida?'))toMenu()});
-$('soloBtn').addEventListener('click',()=>{initAudio();saveName();cleanupNet();mode='solo';myId='p0';seed=Math.floor(Math.random()*1e9);reset(seed);players=[newPlayer('p0',myName(),0)];running=true;hideOv();say('Junte madeira antes da noite!');requestWake()});
+$('menuBtn').addEventListener('click',openPause);
+$('resumeBtn').addEventListener('click',resumeGame);
+$('ctrlBtn').addEventListener('click',()=>setDevice(device==='mobile'?'desktop':'mobile'));
+$('quitBtn').addEventListener('click',()=>{if(confirm(mode==='host'?'Encerrar? A partida acaba para todos.':'Sair da partida?'))toMenu()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&mode==='solo'&&running&&!over&&$('ov').hidden)openPause()});
+$('soloBtn').addEventListener('click',()=>{initAudio();goFull();saveName();cleanupNet();mode='solo';myId='p0';seed=Math.floor(Math.random()*1e9);reset(seed);players=[newPlayer('p0',myName(),0)];running=true;hideOv();say('Junte madeira antes da noite!');requestWake()});
 $('hostBtn').addEventListener('click',createGame);
 $('joinOpenBtn').addEventListener('click',()=>{saveName();show('scrJoin');$('joinStatus').textContent='';setTimeout(()=>$('codeIn').focus(),50)});
 $('joinBtn').addEventListener('click',joinGame);
@@ -1171,7 +1281,7 @@ function render(now){
   const nm=store.get('nnf-nome')||'';$('nameIn').value=nm;$('nameIn2').value=nm;
   $('nameIn').addEventListener('input',()=>{$('nameIn2').value=$('nameIn').value});
   $('nameIn2').addEventListener('input',()=>{$('nameIn').value=$('nameIn2').value});
-  setSound(soundOn);buildCraft();fit();reset(12345);showRecord();
+  setSound(soundOn);buildCraft();setDevice(detectDevice());reset(12345);showRecord();
   const qc=new URLSearchParams(location.search).get('c');
   if(qc){show('scrJoin');$('codeIn').value=qc.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4)}else show('scrMenu');
   requestAnimationFrame(render);
