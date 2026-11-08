@@ -756,7 +756,7 @@ function snap(){
 }
 function sendSnap(){if(!conns.length||!running){evq=[];return}const s=snap();for(const cn of conns)if(cn.open&&cn.ready)try{cn.send(s)}catch(e){}}
 function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return s}
-function myName(){const v=($('nameIn').value||$('nameIn2').value||'').trim();return (v||'Jogador').slice(0,12)}
+function myName(){const v=((!$('scrJoin').hidden?$('nameIn2').value:$('nameIn').value)||$('nameIn').value||$('nameIn2').value||'').trim();return (v||'Jogador').slice(0,12)}
 function netOk(){if(window.Peer)return true;return false}
 function createGame(){
   initAudio();saveName();
