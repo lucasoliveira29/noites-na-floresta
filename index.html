@@ -786,7 +786,7 @@ const $=id=>document.getElementById(id);
 const c=$('c'),x=c.getContext('2d');
 const dc=document.createElement('canvas'),d2=dc.getContext('2d');
 let VW=800,VH=560;
-const WW=9500,WH=7000,DAY=45,NIGHT=28,CYCLE=DAY+NIGHT,TORCH_R=100,MAXP=4,SH_R=78;
+const WW=9500,WH=7000,DAY=26,NIGHT=20,CYCLE=DAY+NIGHT,TORCH_R=100,MAXP=4,SH_R=78;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 let rng=Math.random;const R=()=>rng();
@@ -857,9 +857,10 @@ function reset(sd){
   fire={x:WW/2,y:WH/2,fuel:70};bench={x:fire.x+120,y:fire.y-4};depot={x:fire.x-120,y:fire.y-4,wood:0};
   lv={bag:0,axe:0,fire:0,lamp:0};inv={torch:1,trap:0,shelter:0};torches=[];traps=[];shelters=[];mons=[];
   night=1;time=0;dark=false;parts=[];floats=[];lowWarn=false;paused=false;over=null;evq=[];msgT=0;
-  const spots=[],rings=[[900,500],[1700,700],[2600,900],[3600,1300]];
-  for(const [r0,dr] of rings){for(let tries=0;tries<200;tries++){const a=R()*TAU,d=r0+R()*dr,sx=clamp(fire.x+Math.cos(a)*d,160,WW-160),sy=clamp(fire.y+Math.sin(a)*d*.8,160,WH-160);
-    if(spots.some(([q1,q2])=>Math.hypot(q1-sx,q2-sy)<800)&&tries<150)continue;spots.push([sx,sy]);break}}
+  const spots=[];let tries=0;
+  while(spots.length<4&&tries<5000){tries++;const sx=140+R()*(WW-280),sy=140+R()*(WH-280);
+    if(Math.hypot(sx-fire.x,sy-fire.y)<650)continue;
+    if(spots.some(([a,b])=>Math.hypot(a-sx,b-sy)<(tries<3000?750:450)))continue;spots.push([sx,sy])}
   const looks=[{shirt:'#f4b63f',hair:'#3b2416'},{shirt:'#e86fb8',hair:'#e0b25a'},{shirt:'#4fc27a',hair:'#1b1b1b'},{shirt:'#4fa3e8',hair:'#8a4b22'}];
   friends=spots.map(([fx_,fy],i)=>({x:fx_,y:fy,heard:{},st:'lost',job:'rest',carry:0,face:1,step:0,swing:0,mv:false,lead:'',...looks[i]}));
   friends.forEach(f=>{f.tx=f.x;f.ty=f.y});
@@ -1044,7 +1045,7 @@ function step(){
   const leadCount={};
   for(const f of friends){
     f.px=f.x;f.py=f.y;
-    if(f.st==='lost'){for(const q of players)if(!q.down&&!f.heard[q.id]&&Math.hypot(f.x-q.x,f.y-q.y)<520){f.heard[q.id]=1;say('Você ouve alguém pedindo socorro por perto!',q.id);snd('friend',q.id)}
+    if(f.st==='lost'){for(const q of players)if(!q.down&&!f.heard[q.id]&&Math.hypot(f.x-q.x,f.y-q.y)<330){f.heard[q.id]=1;say('Você ouve alguém pedindo socorro por perto!',q.id);snd('friend',q.id)}
       const p=players.find(p=>!p.down&&Math.hypot(f.x-p.x,f.y-p.y)<38);
       if(p){f.st='follow';f.lead=p.id;say((players.length>1?p.name+' achou':'Você achou')+' um amigo! Levem até a fogueira.');snd('friend')}}
     if(f.st==='follow'){
