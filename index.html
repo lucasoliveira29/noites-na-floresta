@@ -175,7 +175,9 @@ body.mobile .act{width:112px;height:112px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
   <div><strong>Teclado</strong><kbd>setas</kbd> ou <kbd>W A S D</kbd> andam. <kbd>Espaço</kbd> faz a ação. <kbd>Q</kbd> coloca a tocha ou armadilha, <kbd>X</kbd> troca o item e <kbd>Esc</kbd> abre o menu.</div>
   <div><strong>Jogar com amigos</strong>Uma pessoa clica em "Criar partida online" e passa o código. As outras, até 4 no total, entram com o código no computador ou no celular.</div>
   <div><strong>Juntos na floresta</strong>A fogueira, o depósito e a bancada são do grupo. Se alguém cair, outro jogador chega perto e aperta <kbd>Espaço</kbd> para ajudar. Todo mundo levanta ao amanhecer.</div>
-  <div><strong>Amigos perdidos</strong>Siga os caminhos de terra até os pontos amarelos do mapinha. Depois de salvos, eles cortam árvores de dia e alimentam o fogo de noite.</div>
+  <div><strong>Amigos perdidos</strong>Eles se escondem num lugar diferente a cada partida e não aparecem no mapinha. Explore a floresta: quando chegar perto, você ouve o pedido de socorro. Salvos, eles cortam árvores e alimentam o fogo.</div>
+  <div><strong>Abrigos</strong>Fabrique um abrigo na bancada por 20 madeiras e coloque com <kbd>Q</kbd> longe da fogueira. Os monstros não entram na cerca, e dentro dela a vida se recupera devagar.</div>
+  <div><strong>Cada noite é pior</strong>A cada noite aparecem mais lobos e Sombras, e eles ficam mais rápidos e mordem mais forte. Prepare tochas, armadilhas e abrigos antes de escurecer.</div>
 </div>
 
 <div class="overlay" id="ov">
@@ -259,29 +261,30 @@ body.mobile .act{width:112px;height:112px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 function makeGround(){
   const g=document.createElement('canvas');g.width=WW;g.height=WH;const q=g.getContext('2d');
   q.fillStyle='#22432b';q.fillRect(0,0,WW,WH);
-  for(let i=0;i<260;i++){const px=R()*WW,py=R()*WH,r=40+R()*130;q.fillStyle=R()<.5?'rgba(52,96,58,.32)':'rgba(14,36,22,.32)';q.beginPath();q.ellipse(px,py,r,r*.7,R()*3,0,7);q.fill()}
+  for(let i=0;i<720;i++){const px=R()*WW,py=R()*WH,r=40+R()*130;q.fillStyle=R()<.5?'rgba(52,96,58,.32)':'rgba(14,36,22,.32)';q.beginPath();q.ellipse(px,py,r,r*.7,R()*3,0,7);q.fill()}
   q.lineCap='round';
-  for(const f of friends){
-    const mx=(fire.x+f.x)/2+(R()-.5)*220,my=(fire.y+f.y)/2+(R()-.5)*160;
-    q.strokeStyle='rgba(98,80,52,.55)';q.lineWidth=18;q.beginPath();q.moveTo(fire.x,fire.y);q.quadraticCurveTo(mx,my,f.x,f.y);q.stroke();
+  for(let i=0;i<6;i++){
+    const a=R()*6.283,len=700+R()*900,ex=clamp(fire.x+Math.cos(a)*len,60,WW-60),ey=clamp(fire.y+Math.sin(a)*len*.8,60,WH-60);
+    const mx=(fire.x+ex)/2+(R()-.5)*360,my=(fire.y+ey)/2+(R()-.5)*260;
+    q.strokeStyle='rgba(98,80,52,.55)';q.lineWidth=18;q.beginPath();q.moveTo(fire.x,fire.y);q.quadraticCurveTo(mx,my,ex,ey);q.stroke();
     q.strokeStyle='rgba(120,100,66,.35)';q.lineWidth=8;q.stroke();
   }
   const cg=q.createRadialGradient(fire.x,fire.y+10,20,fire.x,fire.y+10,230);
   cg.addColorStop(0,'#7a6642');cg.addColorStop(.65,'#5d5236');cg.addColorStop(1,'rgba(93,82,54,0)');
   q.fillStyle=cg;q.beginPath();q.ellipse(fire.x,fire.y+10,240,185,0,0,7);q.fill();
-  for(let i=0;i<5200;i++){const px=R()*WW,py=R()*WH;
+  for(let i=0;i<14500;i++){const px=R()*WW,py=R()*WH;
     if(((px-fire.x)/200)**2+((py-fire.y-10)/155)**2<1)continue;
     q.strokeStyle=['#2f5e37','#285031','#3d7444','#336a3b'][i%4];q.lineWidth=1.4;
     q.beginPath();q.moveTo(px,py);q.lineTo(px+(R()-.5)*4,py-4-R()*6);q.stroke();}
-  for(let i=0;i<180;i++){const px=R()*WW,py=R()*WH;if(Math.hypot(px-fire.x,py-fire.y)<200)continue;
+  for(let i=0;i<500;i++){const px=R()*WW,py=R()*WH;if(Math.hypot(px-fire.x,py-fire.y)<200)continue;
     const col=['#f7d354','#f28fd0','#ffffff','#8fd3ff','#ff8a65'][i%5];q.fillStyle=col;
     for(let k=0;k<4;k++){q.beginPath();q.arc(px+Math.cos(k*1.57)*2.2,py+Math.sin(k*1.57)*2.2,1.7,0,7);q.fill()}
     q.fillStyle='#ffe066';q.beginPath();q.arc(px,py,1.2,0,7);q.fill();}
-  for(let i=0;i<55;i++){const px=R()*WW,py=R()*WH,r=5+R()*8;
+  for(let i=0;i<150;i++){const px=R()*WW,py=R()*WH,r=5+R()*8;
     q.fillStyle='rgba(0,0,0,.25)';q.beginPath();q.ellipse(px+2,py+3,r,r*.6,0,0,7);q.fill();
     q.fillStyle='#7d8a86';q.beginPath();q.ellipse(px,py,r,r*.7,0,0,7);q.fill();
     q.fillStyle='#a3aea9';q.beginPath();q.ellipse(px-r*.3,py-r*.25,r*.45,r*.3,0,0,7);q.fill();}
-  for(let i=0;i<35;i++){const px=R()*WW,py=R()*WH;if(Math.hypot(px-fire.x,py-fire.y)<200)continue;
+  for(let i=0;i<95;i++){const px=R()*WW,py=R()*WH;if(Math.hypot(px-fire.x,py-fire.y)<200)continue;
     q.fillStyle='#efe6d2';q.fillRect(px-1.5,py-4,3,6);
     q.fillStyle='#d6453d';q.beginPath();q.arc(px,py-4,5,Math.PI,0);q.fill();
     q.fillStyle='#fff';q.fillRect(px-2,py-7,1.5,1.5);q.fillRect(px+1.5,py-6,1.5,1.5);}
@@ -470,6 +473,35 @@ function drawClock(){
   x.fillStyle=dark?'#a8d8ff':'#ffe08a';if(warn)x.fillStyle='#fff';x.fillText(txt,cx,cy+Rr+25);
 }
 /* ---------- ícones da bancada ---------- */
+function drawShelterBack(h){
+  const r=SH_R;
+  x.fillStyle='rgba(120,96,60,.55)';x.beginPath();x.ellipse(h.x,h.y,r,r*.72,0,0,7);x.fill();
+  x.fillStyle='rgba(150,120,78,.35)';x.beginPath();x.ellipse(h.x,h.y+4,r*.75,r*.5,0,0,7);x.fill();
+  /* cabana no fundo */
+  const cx=h.x,cy=h.y-r*.28;
+  x.fillStyle='rgba(0,0,0,.25)';x.fillRect(cx-30,cy+14,64,8);
+  x.fillStyle='#7a5230';x.fillRect(cx-28,cy-8,56,24);
+  x.strokeStyle='#5b3b1e';x.lineWidth=1.5;for(let i=0;i<4;i++){x.beginPath();x.moveTo(cx-28,cy-4+i*6);x.lineTo(cx+28,cy-4+i*6);x.stroke()}
+  x.fillStyle='#3a2414';x.fillRect(cx-7,cy,14,16);
+  x.fillStyle='#9b3d2a';x.beginPath();x.moveTo(cx-36,cy-6);x.lineTo(cx,cy-32);x.lineTo(cx+36,cy-6);x.closePath();x.fill();
+  x.fillStyle='#b8523a';x.beginPath();x.moveTo(cx-30,cy-8);x.lineTo(cx,cy-28);x.lineTo(cx-2,cy-8);x.closePath();x.fill();
+  x.fillStyle='#ffe08a';x.fillRect(cx+14,cy-2,7,7);
+  /* estacas do fundo */
+  palisade(h,true);
+}
+function palisade(h,back){
+  const r=SH_R,n=26;
+  for(let i=0;i<n;i++){
+    const a=i/n*Math.PI*2,sx=Math.cos(a),sy=Math.sin(a);
+    if(back?sy>0:sy<=0)continue;
+    if(!back&&Math.abs(a-Math.PI/2)<.32)continue; /* portão */
+    const px=h.x+sx*r,py=h.y+sy*r*.72;
+    x.fillStyle='#5b3b1e';x.fillRect(px-4,py-24,8,26);
+    x.fillStyle='#7a5230';x.fillRect(px-3,py-24,4,26);
+    x.fillStyle='#8a5e33';x.beginPath();x.moveTo(px-4,py-24);x.lineTo(px,py-30);x.lineTo(px+4,py-24);x.fill();
+  }
+}
+function drawShelterFront(h){palisade(h,false)}
 function drawIcon(q,id){
   q.scale(2,2);q.fillStyle='#0c1410';q.fillRect(0,0,52,52);q.lineCap='round';
   if(id==='bag'){q.fillStyle='#8a5a2b';q.beginPath();q.roundRect(12,14,28,30,7);q.fill();q.fillStyle='#6e4826';q.beginPath();q.roundRect(15,26,22,12,4);q.fill();q.strokeStyle='#5b3b1e';q.lineWidth=3;q.beginPath();q.arc(26,15,7,Math.PI,0);q.stroke();q.fillStyle='#e9b949';q.fillRect(24,30,4,4)}
@@ -479,6 +511,8 @@ function drawIcon(q,id){
   if(id==='lamp'){const g=q.createRadialGradient(26,30,2,26,30,22);g.addColorStop(0,'rgba(255,229,138,.6)');g.addColorStop(1,'rgba(255,229,138,0)');q.fillStyle=g;q.fillRect(0,0,52,52);
     q.strokeStyle='#4a3a20';q.lineWidth=2;q.beginPath();q.arc(26,14,5,Math.PI,0);q.stroke();q.fillStyle='#4a3a20';q.fillRect(18,16,16,4);q.fillRect(18,40,16,4);q.fillStyle='#ffe58a';q.fillRect(19,20,14,20);q.fillStyle='#ff9a2e';q.beginPath();q.ellipse(26,32,3,6,0,0,7);q.fill()}
   if(id==='torch'){q.fillStyle='#6e4826';q.fillRect(23,22,6,26);q.fillStyle='#4a2f17';q.fillRect(21,20,10,6);q.fillStyle='#ff7a1f';q.beginPath();q.moveTo(19,21);q.quadraticCurveTo(26,-2,33,21);q.fill();q.fillStyle='#ffe08a';q.beginPath();q.moveTo(22,21);q.quadraticCurveTo(26,8,30,21);q.fill()}
+  if(id==='shelter'){q.fillStyle='#7a5230';q.fillRect(14,24,24,16);q.fillStyle='#9b3d2a';q.beginPath();q.moveTo(10,26);q.lineTo(26,12);q.lineTo(42,26);q.fill();q.fillStyle='#3a2414';q.fillRect(23,30,6,10);
+    q.fillStyle='#5b3b1e';for(let i=0;i<8;i++){const xx=4+i*6.2;if(i===3||i===4)continue;q.fillRect(xx,36,4,12);q.beginPath();q.moveTo(xx,36);q.lineTo(xx+2,33);q.lineTo(xx+4,36);q.fill()}}
   if(id==='trap'){q.fillStyle='#4f5559';q.beginPath();q.ellipse(26,30,18,9,0,0,7);q.fill();q.strokeStyle='#9aa3a8';q.lineWidth=2.5;q.beginPath();q.ellipse(26,30,15,7,0,0,7);q.stroke();q.fillStyle='#c5ccd0';
     for(let i=-2;i<=2;i++){q.beginPath();q.moveTo(26+i*5-2.5,26);q.lineTo(26+i*5,19);q.lineTo(26+i*5+2.5,26);q.fill();q.beginPath();q.moveTo(26+i*5-2.5,34);q.lineTo(26+i*5,41);q.lineTo(26+i*5+2.5,34);q.fill()}q.fillStyle='#d8a33a';q.fillRect(23,28,6,4)}
 }
@@ -487,7 +521,7 @@ const $=id=>document.getElementById(id);
 const c=$('c'),x=c.getContext('2d');
 const dc=document.createElement('canvas'),d2=dc.getContext('2d');
 let VW=800,VH=560;
-const WW=1800,WH=1300,DAY=26,NIGHT=20,CYCLE=DAY+NIGHT,TORCH_R=100,MAXP=4;
+const WW=3000,WH=2200,DAY=26,NIGHT=20,CYCLE=DAY+NIGHT,TORCH_R=100,MAXP=4,SH_R=78;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 let rng=Math.random;const R=()=>rng();
@@ -500,15 +534,16 @@ const REC=[
   {id:'fire',name:'Fogueira',desc:['Luz da fogueira maior','Luz da fogueira gigante'],cost:[12,24]},
   {id:'lamp',name:'Lanterna',desc:['Ilumina todos e deixa os inimigos lentos'],cost:[15]},
   {id:'torch',name:'Tocha',desc:'Luz extra que dura 2 noites',cost:4,item:true},
-  {id:'trap',name:'Armadilha',desc:'Prende um lobo até amanhecer',cost:5,item:true}
+  {id:'trap',name:'Armadilha',desc:'Prende um lobo até amanhecer',cost:5,item:true},
+  {id:'shelter',name:'Abrigo',desc:'Cerca com cabana onde os monstros não entram',cost:20,item:true}
 ];
-const INAME={torch:'Tocha',trap:'Armadilha'};
+const INAME={torch:'Tocha',trap:'Armadilha',shelter:'Abrigo'},ITEMS=['torch','trap','shelter'];
 
 /* ---------- estado ---------- */
 let mode='solo',myId='p0',peer=null,conns=[],hostConn=null,code='',lobbyNames=[],nextId=1,welcomed=false;
 let goal=10,diff='facil',best=+(store.get('nnf-recorde')||0),seed=1;
 let players=[],trees=[],bushes=[],friends=[],fire={x:WW/2,y:WH/2,fuel:70},bench={x:0,y:0},depot={x:0,y:0,wood:0};
-let lv={bag:0,axe:0,fire:0,lamp:0},inv={torch:1,trap:0},sel='torch',torches=[],traps=[],mons=[];
+let lv={bag:0,axe:0,fire:0,lamp:0},inv={torch:1,trap:0,shelter:0},sel='torch',torches=[],traps=[],shelters=[],mons=[];
 let night=1,time=0,dark=false,parts=[],floats=[],ground=null,cam={x:0,y:0};
 let running=false,paused=false,over=null,msg='',msgT=0,frame=0,tick=0,shake=0,lowWarn=false,evq=[];
 const keys={up:0,down:0,left:0,right:0};
@@ -555,19 +590,22 @@ function free(px,py,list,md){return list.every(o=>Math.hypot(o.x-px,o.y-py)>md)}
 function reset(sd){
   rng=mulberry(sd);
   fire={x:WW/2,y:WH/2,fuel:70};bench={x:fire.x+120,y:fire.y-4};depot={x:fire.x-120,y:fire.y-4,wood:0};
-  lv={bag:0,axe:0,fire:0,lamp:0};inv={torch:1,trap:0};torches=[];traps=[];mons=[];
+  lv={bag:0,axe:0,fire:0,lamp:0};inv={torch:1,trap:0,shelter:0};torches=[];traps=[];shelters=[];mons=[];
   night=1;time=0;dark=false;parts=[];floats=[];lowWarn=false;paused=false;over=null;evq=[];msgT=0;
-  const spots=[[170,170],[WW-170,180],[180,WH-170],[WW-180,WH-170]];
+  const spots=[];let tries=0;
+  while(spots.length<4&&tries<5000){tries++;const sx=140+R()*(WW-280),sy=140+R()*(WH-280);
+    if(Math.hypot(sx-fire.x,sy-fire.y)<650)continue;
+    if(spots.some(([a,b])=>Math.hypot(a-sx,b-sy)<(tries<3000?750:450)))continue;spots.push([sx,sy])}
   const looks=[{shirt:'#f4b63f',hair:'#3b2416'},{shirt:'#e86fb8',hair:'#e0b25a'},{shirt:'#4fc27a',hair:'#1b1b1b'},{shirt:'#4fa3e8',hair:'#8a4b22'}];
-  friends=spots.map(([fx_,fy],i)=>({x:fx_+(R()-.5)*80,y:fy+(R()-.5)*80,st:'lost',job:'rest',carry:0,face:1,step:0,swing:0,mv:false,lead:'',...looks[i]}));
+  friends=spots.map(([fx_,fy],i)=>({x:fx_,y:fy,heard:{},st:'lost',job:'rest',carry:0,face:1,step:0,swing:0,mv:false,lead:'',...looks[i]}));
   friends.forEach(f=>{f.tx=f.x;f.ty=f.y});
   trees=[];let n=0;
-  while(trees.length<100&&n<8000){n++;const tx=40+R()*(WW-80),ty=60+R()*(WH-90);
+  while(trees.length<290&&n<20000){n++;const tx=40+R()*(WW-80),ty=60+R()*(WH-90);
     if(Math.hypot(tx-fire.x,ty-fire.y)<220)continue;
     if(!free(tx,ty,trees,54)||!free(tx,ty,friends,70))continue;
     trees.push({x:tx,y:ty,w:3,v:R(),sh:0,s:.85+R()*.35});}
   bushes=[];n=0;
-  while(bushes.length<20&&n<8000){n++;const bx=70+R()*(WW-140),by=70+R()*(WH-140);
+  while(bushes.length<55&&n<20000){n++;const bx=70+R()*(WW-140),by=70+R()*(WH-140);
     if(Math.hypot(bx-fire.x,by-fire.y)<190)continue;
     if(!free(bx,by,trees,42)||!free(bx,by,bushes,130)||!free(bx,by,friends,60))continue;bushes.push({x:bx,y:by,b:3});}
   ground=makeGround();
@@ -636,17 +674,33 @@ function useReq(p,item){
   if(inv[item]<=0){say('Sem '+INAME[item].toLowerCase()+'. Fabrique na bancada.',p.id);return}
   inv[item]--;
   if(item==='torch'){torches.push({x:p.x+p.face*18,y:p.y+6,life:2});say('Tocha colocada!',p.id);snd('place')}
-  else{traps.push({x:p.x+p.face*22,y:p.y+8,used:false});say('Armadilha armada!',p.id);snd('place')}
+  else if(item==='trap'){traps.push({x:p.x+p.face*22,y:p.y+8,used:false});say('Armadilha armada!',p.id);snd('place')}
+  else{
+    const hx=Math.round(p.x),hy=Math.round(p.y-8);
+    if(Math.hypot(hx-fire.x,hy-fire.y)<260||shelters.some(h=>Math.hypot(h.x-hx,h.y-hy)<SH_R*2.1)){inv[item]++;say('Aqui não cabe. Monte o abrigo longe da fogueira e de outros abrigos.',p.id);snd('no',p.id);return}
+    trees.forEach((t,i)=>{if(t.w>0&&Math.hypot(t.x-hx,(t.y-hy)/.72)<SH_R+18){t.w=0;fx({k:'tsh',i})}});
+    shelters.push({x:hx,y:hy});say((players.length>1?p.name+' montou um abrigo!':'Abrigo montado!')+' Os monstros não entram nele.');snd('craft');fx({k:'burst',x:hx,y:hy,c:'#c79a63',n:24});
+  }
 }
+const inShelter=(px,py,pad=0)=>shelters.find(h=>Math.hypot(px-h.x,(py-h.y)/.72)<SH_R+pad);
 
 /* ---------- noite ---------- */
+function dangerStats(){
+  const e=diff==='facil',n=night,np=players.length||1;
+  return {
+    shades:Math.min(e?4:7,1+Math.floor((n-1)/(e?4:3))+(np>=3?1:0)),
+    wolves:Math.min(e?12:20,Math.floor((n-1)*(e?.8:1.3))+(np-1)*2+(e?0:1)),
+    speed:1+Math.min(e?.45:.8,(n-1)*(e?.03:.05)),
+    dmg:(e?.5:1)*(1+Math.min(1,(n-1)*(e?.03:.06)))
+  };
+}
 function spawn(){
-  mons=[];const e=diff==='facil',np=players.length;
-  const nm=1+Math.floor(night/(e?20:12))+(np>=3?1:0),nw=Math.min(10,Math.floor(night/(e?4:2))+(np-1));
-  const ref=players[0]||fire;
-  for(let i=0;i<nm+nw;i++){const a=Math.random()*6.283,dist=560+Math.random()*200;
-    mons.push({x:clamp(fire.x+Math.cos(a)*dist,10,WW-10),y:clamp(fire.y+Math.sin(a)*dist,10,WH-10),t:i<nm?'m':'w',ph:Math.random()*6.283,vx:0,stuck:0,tx:0,ty:0})}
-  if(nw)snd('howl');
+  mons=[];const st=dangerStats(),alive=players.filter(p=>!p.down),refs=alive.length?alive:[fire];
+  for(let i=0;i<st.shades+st.wolves;i++){
+    const ref=refs[i%refs.length],a=Math.random()*6.283,dist=620+Math.random()*260;
+    mons.push({x:clamp(ref.x+Math.cos(a)*dist,10,WW-10),y:clamp(ref.y+Math.sin(a)*dist,10,WH-10),t:i<st.shades?'m':'w',ph:Math.random()*6.283,vx:0,stuck:0,tx:0,ty:0})}
+  if(st.wolves)snd('howl');
+  return st;
 }
 
 /* ---------- amigos ajudantes ---------- */
@@ -706,23 +760,24 @@ function step(){
   }
   time+=1/60;const cy=time%CYCLE,was=dark;dark=cy>=DAY;
   fire.fuel=Math.max(0,fire.fuel-(dark?.045:.018)*(e?.8:1));
-  if(dark&&!was){spawn();say('Anoiteceu! Fiquem na luz do fogo.');snd('night')}
+  if(dark&&!was){const st=spawn();say('Noite '+night+': '+st.shades+(st.shades>1?' Sombras':' Sombra')+' e '+st.wolves+(st.wolves===1?' lobo':' lobos')+'. Fiquem na luz ou no abrigo!');snd('night')}
   if(!dark&&was){
     mons=[];night++;
     trees.forEach(t=>{if(t.w<3&&Math.random()<.45)t.w=3});bushes.forEach(b=>{b.b=3});
     torches.forEach(t=>t.life--);torches=torches.filter(t=>t.life>0);traps=traps.filter(t=>!t.used);
     let rev=0;for(const p of players)if(p.down){p.down=false;p.hp=50;p.inv=90;rev++}
     if(night>goal){end(true);return}
-    say('Amanheceu! Noite '+night+' de '+goal+(rev?'. Todos de pé!':'.'));snd('dawn');
+    say('Amanheceu! Noite '+night+' de '+goal+(rev?'. Todos de pé!':'. A próxima será mais difícil.'));snd('dawn');
   }
   if(!dark&&Math.abs(cy-(DAY-6))<1/120)say('Vai escurecer! Voltem para a fogueira.');
   if(dark&&fire.fuel<25&&!lowWarn){lowWarn=true;say('A fogueira está fraca! Tragam madeira.')}
-  for(const p of players)if(!p.down&&!dark&&inLight(p.x,p.y)&&p.food>40)p.hp=Math.min(100,p.hp+.05);
+  for(const p of players)if(!p.down&&p.food>40&&((!dark&&inLight(p.x,p.y))||inShelter(p.x,p.y)))p.hp=Math.min(100,p.hp+(dark?.03:.05));
   /* amigos perdidos */
   const leadCount={};
   for(const f of friends){
     f.px=f.x;f.py=f.y;
-    if(f.st==='lost'){const p=players.find(p=>!p.down&&Math.hypot(f.x-p.x,f.y-p.y)<38);
+    if(f.st==='lost'){for(const q of players)if(!q.down&&!f.heard[q.id]&&Math.hypot(f.x-q.x,f.y-q.y)<330){f.heard[q.id]=1;say('Você ouve alguém pedindo socorro por perto!',q.id);snd('friend',q.id)}
+      const p=players.find(p=>!p.down&&Math.hypot(f.x-p.x,f.y-p.y)<38);
       if(p){f.st='follow';f.lead=p.id;say((players.length>1?p.name+' achou':'Você achou')+' um amigo! Levem até a fogueira.');snd('friend')}}
     if(f.st==='follow'){
       const p=players.find(q=>q.id===f.lead&&!q.down)||players.find(q=>!q.down);
@@ -738,24 +793,24 @@ function step(){
   helpers();
   for(const f of friends){f.mv=Math.hypot(f.x-f.px,f.y-f.py)>.2}
   /* inimigos */
-  const alive=players.filter(p=>!p.down);
+  const alive=players.filter(p=>!p.down),dstat=dangerStats();
   for(const m of mons){
     if(m.stuck>0){m.stuck--;continue}
-    const isW=m.t==='w';let spd=isW?Math.min(2.6,1.5+night*.02):Math.min(3,1.25+night*.025);
-    if(e)spd*=.8;
+    const isW=m.t==='w';let spd=(isW?1.45:1.2)*dstat.speed;
     if(lantern()&&alive.some(p=>Math.hypot(p.x-m.x,p.y-m.y)<130))spd*=.5;
     const ox=m.x,L=inLight(m.x,m.y,8);
-    let tgt=null,bd=1e9;for(const p of alive){if(inLight(p.x,p.y))continue;const d=Math.hypot(p.x-m.x,p.y-m.y);if(d<bd){bd=d;tgt=p}}
+    let tgt=null,bd=1e9;for(const p of alive){if(inLight(p.x,p.y)||inShelter(p.x,p.y))continue;const d=Math.hypot(p.x-m.x,p.y-m.y);if(d<bd){bd=d;tgt=p}}
     if(L){const d=Math.hypot(m.x-L.x,m.y-L.y)||1;m.x+=(m.x-L.x)/d*2.6;m.y+=(m.y-L.y)/d*2.6}
     else if(tgt){m.x+=(tgt.x-m.x)/bd*spd;m.y+=(tgt.y-m.y)/bd*spd}
     else{const lr=lights()[0]||{x:fire.x,y:fire.y,r:60};m.ph+=.012;const tx=lr.x+Math.cos(m.ph)*(lr.r+70),ty=lr.y+Math.sin(m.ph)*(lr.r+70),dd=Math.hypot(tx-m.x,ty-m.y)||1,s=Math.min(spd,dd);m.x+=(tx-m.x)/dd*s;m.y+=(ty-m.y)/dd*s}
+    for(const h of shelters){const dx=m.x-h.x,dy=(m.y-h.y)/.72,d=Math.hypot(dx,dy)||1,R0=SH_R+14;if(d<R0){m.x=h.x+dx/d*R0;m.y=h.y+dy/d*R0*.72}}
     m.x=clamp(m.x,8,WW-8);m.y=clamp(m.y,8,WH-8);m.vx=m.x-ox;
     for(const tr of traps)if(!tr.used&&Math.hypot(tr.x-m.x,tr.y-m.y)<22){tr.used=true;m.stuck=isW?1e9:420;m.x=tr.x;m.y=tr.y-4;snd('trap');say(isW?'Um lobo caiu na armadilha!':'A Sombra ficou presa um pouco!')}
     if(m.stuck)continue;
     for(const p of alive){
       const dp=Math.hypot(p.x-m.x,p.y-m.y)||1;
-      if(dp<(isW?22:26)&&p.inv<=0){
-        p.hp-=(isW?10:20)*(e?.5:1);p.inv=70;
+      if(dp<(isW?22:26)&&p.inv<=0&&!inShelter(p.x,p.y)){
+        p.hp-=(isW?10:20)*dstat.dmg;p.inv=70;
         const nx=clamp(p.x+(p.x-m.x)/dp*34,14,WW-14),ny=clamp(p.y+(p.y-m.y)/dp*34,24,WH-14);
         p.x=nx;p.y=ny;if(p.tx!=null){p.tx=nx;p.ty=ny}
         fx({k:'kb',to:p.id,x:nx,y:ny});snd('hurt',p.id);say(isW?'Um lobo te mordeu!':'A Sombra te pegou!',p.id);
@@ -781,7 +836,7 @@ function snap(){
   const r1=v=>Math.round(v);
   return{k:'s',t:+time.toFixed(2),n:night,d:dark?1:0,fu:Math.round(fire.fuel*10)/10,lv,iv:inv,dp:depot.wood,g:goal,df:diff,
     tw:trees.map(t=>t.w).join(''),bb:bushes.map(b=>b.b).join(''),
-    ts:torches.map(t=>[r1(t.x),r1(t.y),t.life]),tp:traps.map(t=>[r1(t.x),r1(t.y),t.used?1:0]),
+    ts:torches.map(t=>[r1(t.x),r1(t.y),t.life]),tp:traps.map(t=>[r1(t.x),r1(t.y),t.used?1:0]),sh:shelters.map(h=>[h.x,h.y]),
     pl:players.map(p=>[p.id,p.name,p.slot,r1(p.x),r1(p.y),Math.ceil(p.hp),Math.round(p.food),p.face,p.wood,p.swing,p.inv,p.down?1:0,p.mv?1:0]),
     fr:friends.map(f=>[r1(f.x),r1(f.y),f.st,f.carry,f.face,f.swing,f.mv?1:0]),
     mo:mons.map(m=>[r1(m.x),r1(m.y),m.t,m.vx>=0?1:-1,m.stuck?1:0,+m.ph.toFixed(2)]),
@@ -827,7 +882,7 @@ function hostRecv(cn,d){
       p.face=d.f>0?1:-1;p.mv=!!d.m}}
   else if(d.k==='act')doAction(p);
   else if(d.k==='craft')craftReq(p,d.i|0);
-  else if(d.k==='use')useReq(p,d.item==='trap'?'trap':'torch');
+  else if(d.k==='use')useReq(p,ITEMS.includes(d.item)?d.item:'torch');
 }
 function dropConn(cn){
   if(!conns.includes(cn))return;
@@ -892,7 +947,7 @@ function hostLost(){
 function applySnap(s){
   time=+s.t||0;night=s.n|0;dark=!!s.d;fire.fuel=+s.fu||0;if(s.lv)lv=s.lv;if(s.iv)inv=s.iv;depot.wood=s.dp|0;goal=s.g|0||goal;diff=s.df==='normal'?'normal':'facil';
   const tw=String(s.tw||''),bb=String(s.bb||'');trees.forEach((t,i)=>{if(i<tw.length)t.w=+tw[i]});bushes.forEach((b,i)=>{if(i<bb.length)b.b=+bb[i]});
-  torches=(s.ts||[]).map(a=>({x:a[0],y:a[1],life:a[2]}));traps=(s.tp||[]).map(a=>({x:a[0],y:a[1],used:!!a[2]}));
+  torches=(s.ts||[]).map(a=>({x:a[0],y:a[1],life:a[2]}));traps=(s.tp||[]).map(a=>({x:a[0],y:a[1],used:!!a[2]}));shelters=(s.sh||[]).map(a=>({x:+a[0],y:+a[1]}));
   const seen=new Set();
   for(const a of s.pl||[]){
     const id=String(a[0]);seen.add(id);let p=players.find(q=>q.id===id);
@@ -945,7 +1000,7 @@ function pressUse(){
   const me=getMe();if(!running||over||!me)return;
   if(mode==='client'){try{hostConn.send({k:'use',item:sel})}catch(e){}}else useReq(me,sel);
 }
-function swapItem(){sel=sel==='torch'?'trap':'torch';hud()}
+function swapItem(){sel=ITEMS[(ITEMS.indexOf(sel)+1)%ITEMS.length];hud()}
 function craftClick(i){
   const me=getMe();if(!me)return;
   if(mode==='client'){try{hostConn.send({k:'craft',i})}catch(e){}}else craftReq(me,i);
@@ -1096,12 +1151,14 @@ function draw(){
   x.save();x.translate(Math.round(-cam.x+sx),Math.round(-cam.y+sy));
   const tg=running&&!over&&me&&!me.down?target(me):null;
   if(tg&&(tg.k==='tree'||tg.k==='bush'||tg.k==='revive')){x.strokeStyle='rgba(255,207,90,.9)';x.lineWidth=2;x.setLineDash([5,4]);x.beginPath();x.ellipse(tg.o.x,tg.o.y+11,24,9,0,0,7);x.stroke();x.setLineDash([])}
+  for(const h of shelters)if(inView(h,140))drawShelterBack(h);
   for(const t of traps)if(inView(t))drawTrap(t);
   for(const b of bushes)if(inView(b))drawBush(b);
   if(tg&&['bench','depot','fire'].includes(tg.k)){const o=tg.k==='bench'?bench:tg.k==='depot'?depot:fire;x.strokeStyle='rgba(255,207,90,.9)';x.lineWidth=2;x.setLineDash([5,4]);x.beginPath();x.ellipse(o.x,o.y+12,40,15,0,0,7);x.stroke();x.setLineDash([])}
   const list=[{y:bench.y+10,d:drawBench},{y:depot.y+10,d:drawDepot},{y:fire.y+10,d:drawFire}];
   for(const t of trees)if(inView(t))list.push({y:t.y+10,d:()=>drawTree(t)});
   for(const t of torches)if(inView(t))list.push({y:t.y,d:()=>drawTorch(t)});
+  for(const h of shelters)if(inView(h,140))list.push({y:h.y+SH_R*.72+4,d:()=>drawShelterFront(h)});
   for(const f of friends)if(inView(f))list.push({y:f.y+10,d:()=>drawFriend(f)});
   for(const m of mons)if(inView(m))list.push({y:m.y+10,d:()=>m.t==='w'?drawWolf(m):drawShade(m)});
   for(const p of players)if(inView(p))list.push({y:p.y+10+(p.down?-6:0),d:()=>drawPlayer(p)});
@@ -1116,6 +1173,7 @@ function draw(){
     d2.globalCompositeOperation='destination-out';
     const Ls=lights();for(const l of Ls)hole(l.x-cam.x,l.y-cam.y,l.r);
     for(const p of players)hole(p.x-cam.x,p.y-cam.y,p.down?40:lantern()?140:62);
+    for(const h of shelters)hole(h.x-cam.x,h.y-cam.y-20,95);
     d2.globalCompositeOperation='source-over';x.drawImage(dc,0,0,VW,VH);
     for(const l of Ls){const g=x.createRadialGradient(l.x-cam.x,l.y-cam.y,0,l.x-cam.x,l.y-cam.y,l.r);g.addColorStop(0,'rgba(255,140,40,'+(.2*a)+')');g.addColorStop(1,'rgba(255,140,40,0)');x.fillStyle=g;x.fillRect(0,0,VW,VH)}
     for(const m of mons)if(inView(m,20))drawEyes(m);
@@ -1130,8 +1188,7 @@ function draw(){
   x.strokeStyle='rgba(232,240,230,.25)';x.strokeRect(m0x+cam.x*s,m0y+cam.y*s,VW*s,VH*s);
   x.fillStyle='#ff9a2e';x.beginPath();x.arc(m0x+fire.x*s,m0y+fire.y*s,4,0,7);x.fill();
   x.fillStyle='#ffcf5a';for(const t of torches)x.fillRect(m0x+t.x*s-1.5,m0y+t.y*s-1.5,3,3);
-  for(const f of friends){if(f.st==='saved'){x.fillStyle='#8ce99a';x.fillRect(m0x+f.x*s-1.5,m0y+f.y*s-1.5,3,3)}
-    else if(f.st==='follow'||frame%40<28){x.fillStyle='#ffd166';x.fillRect(m0x+f.x*s-2.5,m0y+f.y*s-2.5,5,5)}}
+  x.strokeStyle='#c79a63';x.lineWidth=1.5;for(const h of shelters){x.beginPath();x.arc(m0x+h.x*s,m0y+h.y*s,3.5,0,7);x.stroke()}
   if(dark)for(const m of mons){x.fillStyle=m.t==='w'?'#adb5bd':'#c77dff';x.fillRect(m0x+m.x*s-2,m0y+m.y*s-2,4,4)}
   for(const p of players){x.fillStyle=LOOKS[p.slot%4].shirt;x.beginPath();x.arc(m0x+p.x*s,m0y+p.y*s,p.id===myId?4:3,0,7);x.fill();if(p.id===myId){x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke()}}
   if(mode!=='solo'&&running){x.font='bold 12px "Nunito", system-ui, sans-serif';x.textAlign='right';const t=(mode==='host'?'Código '+code+' · ':'')+players.length+' jogando';

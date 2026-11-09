@@ -6,4 +6,5 @@ Jogo de sobrevivência na floresta para jogar sozinho ou com até 4 amigos, no c
 
 - Uma pessoa toca em "Criar partida online" e mostra o código de 4 letras.
 - As outras abrem o mesmo site e tocam em "Entrar com código".
+- Mapa grande, abrigos contra monstros e noites cada vez mais difíceis.
 - A conexão é direta entre os aparelhos (WebRTC via PeerJS), sem login e sem servidor próprio.
